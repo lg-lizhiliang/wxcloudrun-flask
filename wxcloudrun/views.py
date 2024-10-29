@@ -1,9 +1,12 @@
+import logging
 from datetime import datetime
 from flask import render_template, request
 from run import app
 from wxcloudrun.dao import delete_counterbyid, query_counterbyid, insert_counter, update_counterbyid
 from wxcloudrun.model import Counters
 from wxcloudrun.response import make_succ_empty_response, make_succ_response, make_err_response
+
+logger = logging.getLogger('log')
 
 
 @app.route('/')
@@ -64,3 +67,25 @@ def get_count():
     """
     counter = Counters.query.filter(Counters.id == 1).first()
     return make_succ_response(0) if counter is None else make_succ_response(counter.count)
+
+
+@app.route('/wxacallback/biz/<APPID>/callback')
+def wxacallback(APPID):
+    """
+    :return: 计数的值
+    """
+    '''
+    <xml>
+      <ToUserName><![CDATA[toUser]]></ToUserName>
+      <FromUserName><![CDATA[fromUser]]></FromUserName>
+      <CreateTime>1348831860</CreateTime>
+      <MsgType><![CDATA[text]]></MsgType>
+      <Content><![CDATA[this is a test]]></Content>
+      <MsgId>1234567890123456</MsgId>
+      <MsgDataId>xxxx</MsgDataId>
+      <Idx>xxxx</Idx>
+    </xml>
+
+    '''
+    logger.info(f'wxacallback------{APPID}, data={request.data}, args={request.args}')
+    return make_succ_response('ok')
